@@ -205,6 +205,7 @@
       document.querySelector('#crop').classList.toggle('none')
       document.querySelector('#draw').classList.toggle('none')
       document.querySelector('#addText').classList.toggle('none')
+      document.querySelector('.undo-redo-options').classList.toggle('none')
       document.querySelector('.crop-options').classList.toggle('none')
     })
     document.querySelector(`#crop-done`).addEventListener('click', (e) => {
