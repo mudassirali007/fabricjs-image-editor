@@ -85,11 +85,8 @@
       })
 
       document.querySelector(`#downloadPng`).addEventListener('click', function (e) {
-        downloadImage(_self.canvas.toDataURL());
+        downloadImage(_self.canvas.toDataURL({multiplier: 2}));
       })
-
-
-
 
     })();
 
