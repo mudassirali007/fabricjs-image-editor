@@ -5,21 +5,17 @@
   var upload = function (canvas) {
     const _self = this;
 
+
     const processFiles = (files) => {
       if (files.length === 0) return;
       const allowedTypes = ['image/jpeg', 'image/png', 'image/svg+xml']
-      const image = _self.canvas.item(0)
-      if(image) {
-        _self.canvas.remove(image);
-        _self.canvas.renderAll();
-      }
-
+      canvas.clear()
       for (let file of files) {
         // check type
         if (!allowedTypes.includes(file.type)) continue
 
         let reader = new FileReader()
-        canvas.clear()
+
         // handle image, read file, add to canvas
         reader.onload = (f) => {
           // Load an image into Fabric canvas
@@ -34,8 +30,6 @@
             img.set({
               id: 'image',
               selectable: false,
-              // left: canvas.width / 2,
-              // top: canvas.height / 2,
               originX: 'center',
               originY: 'center',
               ogWidth: img.width,
@@ -50,11 +44,18 @@
             canvas.centerObject(img);
             canvas.renderAll()
             _self.history.clearUndoRedoHistory()
+            document.querySelector('#rotate').classList.toggle('none')
+            document.querySelector('#crop').classList.toggle('none')
+            document.querySelector('#draw').classList.toggle('none')
+            document.querySelector('#addText').classList.toggle('none')
+            document.querySelector('.download').classList.toggle('none')
+            document.querySelector('.undo-redo-options').classList.toggle('none')
           });
         }
 
         reader.readAsDataURL(file)
       }
+
     }
 
     document.querySelector(`#btn-image-upload`).addEventListener('change', function (e) {

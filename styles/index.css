@@ -2,6 +2,16 @@ body {
     margin: 0;
 }
 
+.none {
+    display: none;
+}
+.block {
+    display: block;
+}
+.default-container {
+    display: flex;
+    justify-content: center;
+}
 .canvas-container {
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAHUlEQVQ4jWNgYGAQIYAJglEDhoUBg9+FowbQ2gAARjwKARjtnN8AAAAASUVORK5CYII=");
     background-size: 30px 30px;

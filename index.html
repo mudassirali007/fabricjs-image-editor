@@ -23,30 +23,32 @@
 </head>
 <body>
 <aside class="aside-container">
-    <div>
-        <label for="btn-image-upload" class="upload-label">Upload Image</label>
-        <input type="file" id="btn-image-upload" accept="image/*" hidden>
+
+    <button id="rotate" class="none">Rotate</button>
+    <button id="crop" class="none">Crop</button>
+    <button id="draw" class="none">Draw</button>
+    <button id="addText" class="none">Add Text</button>
+    <div class="crop-options none">
+        <button id="crop-done" >Crop Done</button>
     </div>
-    <div>
-        <button id="rotate">Rotate</button>
+    <div class="draw-options none">
+        <button id="draw-done" >Draw Done</button>
     </div>
-    <div>
-        <button id="crop">Crop</button>
-        <button id="crop-done">Crop Done</button>
+    <div class="text-options none">
+        <input id="changeTextColor" type="color" >Text Color</input>
+        <input id="changeTextBGColor" type="color" >Text BG Color</input>
     </div>
-    <div>
-        <button id="draw">Draw</button>
-    </div>
-    <div>
-        <button id="addText">Text</button>
-        <input id="changeTextColor" type="color">Text Color</input>
-        <input id="changeTextBGColor" type="color">Text BG Color</input>
-    </div>
-    <div>
+    <div class="undo-redo-options none">
         <button id="undo">Undo</button>
         <button id="redo">Redo</button>
     </div>
-
+    <div style="margin: auto 12px auto auto;">
+        <label for="btn-image-upload" class="upload-label">Upload Image</label>
+        <input type="file" id="btn-image-upload" accept="image/*" hidden>
+    </div>
+    <div class="download none">
+        <label for="btn-image-upload" class="upload-label" id="downloadPng">Download Image</label>
+    </div>
 </aside>
 <main>
     <div id="image-editor-container" class="default-container">

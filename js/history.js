@@ -22,7 +22,6 @@
                 this.historyInit();
             }
             historyInit = () => {
-                console.log('historyInit called')
                 this.canvas.on({
                     "path:created": this.addToHistory,
                     "object:modified": this.addToHistory,
@@ -30,12 +29,10 @@
                 });
             };
             clearUndoRedoHistory = () => {
-                console.log('cleared')
                 this.undoArray = [];
                 this.redoArray = [];
             };
             addToHistory = (e) => {
-                console.log(e)
                 this.redoArray = [];
                 if (e?.path) e.path.selectable = false;
                 this.undoArray.push(JSON.stringify(this.canvas.toDatalessJSON(this.props)));

@@ -5,18 +5,9 @@
   var crop = function (canvas) {
     const _self = this;
 
-    var artboard;
-    var a_width = 5400;
-    var a_height = 1080;
-    var isDragging = false;
-    var lastPosX = 0;
-    var lastPosY = 0;
-    var activeObject;
-    var croppableImage;
-    var cropleft;
-    var croptop;
-    var cropscalex;
-    var cropscaley;
+
+    let activeObject;
+
 
     const addCropRect = () => {
       // After rendering the image, add a rectangle for cropping
@@ -91,7 +82,7 @@
     }
 
     // Function to crop the image
-    const cropImage2 = () => {
+    const cropImage = () => {
       const image = canvas.getItemById('image');
       const croppingRect = canvas.getItemById('croppingRect');
 
@@ -123,286 +114,69 @@
       canvas.renderAll();
     };
 
-
-    function overlay() {
-      canvas.add(
-          new fabric.Rect({
-            // originX: "left",
-            // originY: "top",
-            width: canvas.width,
-            height: canvas.height,
-            fill: "rgba(0,0,0,0.5)",
-            selectable: false,
-            id: "overlay",
-          })
-      );
-    }
-
-    function cropImage() {
-      croppableImage = activeObject;
-      canvas.uniformScaling = false;
-      activeObject.setCoords();
-      let left =
-          activeObject.get("left") -
-          (activeObject.get("width") * activeObject.get("scaleX")) / 2;
-      let top =
-          activeObject.get("top") -
-          (activeObject.get("height") * activeObject.get("scaleY")) / 2;
-      let cropx = activeObject.get("cropX");
-      let cropy = activeObject.get("cropY");
-      let cropUI = new fabric.Rect({
-        left: activeObject.get("left"),
-        top: activeObject.get("top"),
-        width: activeObject.get("width") * activeObject.get("scaleX") - 5,
-        height: activeObject.get("height") * activeObject.get("scaleY") - 5,
-        // width: activeObject.get("width"),
-        // height: activeObject.get("height"),
-        // scaleX: activeObject.get("scaleX"),
-        // scaleY: activeObject.get("scaleY"),
-        originX: "center",
-        originY: "center",
-        id: "crop",
-        fill: "rgba(0,0,0,0)",
-        shadow: {
-          color: "black",
-          offsetX: 0,
-          offsetY: 0,
-          blur: 0,
-          opacity: 0,
-        },
-      });
-      activeObject.clone(function (cloned) {
-        cloned.set({
-          id: "cropped",
-          selectable: false,
-          originX: "center",
-          originY: "center",
-        });
-        canvas.add(cloned);
-        canvas.bringToFront(cloned);
-        canvas.bringToFront(cropUI);
-        canvas.renderAll();
-      });
-      activeObject
-          .set({
-            cropX: 0,
-            cropY: 0,
-            width: activeObject.get("ogWidth"),
-            height: activeObject.get("ogHeight"),
-            // scaleX: activeObject.get("ogScaleX"),
-            // scaleY: activeObject.get("ogScaleY"),
-          })
-          .setCoords();
-      canvas.renderAll();
-      activeObject.set({
-        left:
-            left +
-            (activeObject.get("width") * activeObject.get("scaleX")) / 2 -
-            cropx * activeObject.get("scaleX"),
-        top:
-            top +
-            (activeObject.get("height") * activeObject.get("scaleY")) / 2 -
-            cropy * activeObject.get("scaleY"),
-      });
-      cropUI.setControlsVisibility({
-        mt: true,
-        mb: true,
-        ml: true,
-        mr: true,
-        bl: true,
-        br: true,
-        tl: true,
-        tr: true,
-        mtr: false,
-      });
-      canvas.add(cropUI).setActiveObject(cropUI).renderAll();
-      cropleft = cropUI.get("left");
-      croptop = cropUI.get("top");
-      cropscalex = cropUI.get("scaleX");
-      cropscaley = cropUI.get("scaleY");
-
-      overlay();
-    }
-    function crop(obj) {
-      let crop = canvas.getItemById("crop");
-      croppableImage.setCoords();
-      crop.setCoords();
-      let cleft = crop.get("left") - (crop.get("width") * crop.get("scaleX")) / 2;
-      let ctop = crop.get("top") - (crop.get("height") * crop.get("scaleY")) / 2;
-      let height =
-          (crop.get("height") / croppableImage.get("scaleY")) * crop.get("scaleY");
-      let width =
-          (crop.get("width") / croppableImage.get("scaleX")) * crop.get("scaleX");
-      let left =
-          cleft -
-          (croppableImage.get("left") -
-              (croppableImage.get("width") * croppableImage.get("scaleX")) / 2);
-      let top =
-          ctop -
-          (croppableImage.get("top") -
-              (croppableImage.get("height") * croppableImage.get("scaleY")) / 2);
-
-      if (left < 0 && top > 0) {
-        obj
-            .set({ cropY: top / croppableImage.get("scaleY"), height: height })
-            .setCoords();
-        canvas.renderAll();
-        obj.set({
-          top: ctop + (obj.get("height") * obj.get("scaleY")) / 2,
-        });
-      } else if (top < 0 && left > 0) {
-        obj
-            .set({ cropX: left / croppableImage.get("scaleX"), width: width })
-            .setCoords();
-        canvas.renderAll();
-        obj.set({
-          left: cleft + (obj.get("width") * obj.get("scaleX")) / 2,
-        });
-      } else if (top > 0 && left > 0) {
-        obj
-            .set({
-              cropX: left / croppableImage.get("scaleX"),
-              cropY: top / croppableImage.get("scaleY"),
-              height: height,
-              width: width,
-            })
-            .setCoords();
-        canvas.renderAll();
-        obj.set({
-          left: cleft + (obj.get("width") * obj.get("scaleX")) / 2,
-          top: ctop + (obj.get("height") * obj.get("scaleY")) / 2,
-        });
-      }
-      canvas.renderAll();
-      if (obj.get("id") != "cropped") {
-        cancelCrop();
-      }
-    }
-    function cancelCrop() {
-      canvas.remove(canvas.getItemById("crop"));
-      canvas.remove(canvas.getItemById("overlay"));
-      canvas.remove(canvas.getItemById("cropped"));
-      canvas.uniformScaling = true;
-      canvas.renderAll();
-    }
-    function checkCrop(obj) {
-      if (obj.isContainedWithinObject(croppableImage)) {
-        croptop = obj.get("top");
-        cropleft = obj.get("left");
-        cropscalex = obj.get("scaleX");
-        cropscaley = obj.get("scaleY");
-      } else {
-        obj.top = croptop;
-        obj.left = cropleft;
-        obj.scaleX = cropscalex;
-        obj.scaleY = cropscaley;
-        obj.setCoords();
-        obj.saveState();
-      }
-      obj.set({
-        borderColor: "#51B9F9",
-      });
-      canvas.renderAll();
-      crop(canvas.getItemById("cropped"));
-    }
-
-    function limitRectMoving() {
-      let top = activeObject.top;
-      let bottom = top + activeObject.getScaledHeight();
-      let left = activeObject.left;
-      let right = left + activeObject.getScaledWidth();
-
-      // let topBound = croppableImage.getBoundingRect().top;
-      let topBound = croppableImage.top;
-      let bottomBound = topBound + croppableImage.getScaledHeight();
-      // let leftBound = croppableImage.getBoundingRect().left;
-      let leftBound = croppableImage.left;
-      let rightBound = leftBound + croppableImage.getScaledWidth();
-
-      activeObject.set(
-          "left",
-          Math.min(
-              Math.max(left, leftBound),
-              rightBound - activeObject.getScaledWidth()
-          )
-      );
-      activeObject.set(
-          "top",
-          Math.min(
-              Math.max(top, topBound),
-              bottomBound - activeObject.getScaledHeight()
-          )
-      );
-    }
-
     function fitImageOnScreen(){
       activeObject = canvas.getItemById('image')
-      const scaleX = canvas.width / activeObject.width;
-      const scaleY = canvas.height / activeObject.height;
+      const scaleX = window.innerWidth / activeObject.width;
+      const scaleY = (window.innerHeight * 0.9) / activeObject.height;
       const scale = Math.min(scaleX, scaleY); // Use the smaller scale to ensure the image fits both dimensions
       activeObject.scale(scale);
       canvas.setWidth(activeObject.width*scale);
       canvas.setHeight(activeObject.height*scale);
       canvas.centerObject(activeObject);
       canvas.renderAll();
+
+
     }
 
 
     (() => {
       canvas.on("object:modified", function (e) {
         activeObject = e.target;
-        if (activeObject.id == "crop") {
-          checkCrop(activeObject);
-          return;
-        }
       });
       canvas.on("object:moving", function (e) {
         activeObject = e.target;
-
-        if (activeObject.id == "crop") {
-          // limitRectMoving();
-          if (activeObject.isContainedWithinObject(croppableImage)) {
-            cropleft = activeObject.get("left");
-            croptop = activeObject.get("top");
-            cropscalex = activeObject.get("scaleX");
-            cropscaley = activeObject.get("scaleY");
-          }
-          crop(canvas.getItemById("cropped"));
-          return;
-        }
         if(activeObject.id === 'croppingRect') checkBoundariesMoving(e)
-
       });
       canvas.on("object:scaling", function (e) {
         activeObject = e.target;
-        if (activeObject.id == "crop") {
-          // limitRectScaling();
-          if (activeObject.isContainedWithinObject(croppableImage)) {
-            cropleft = activeObject.get("left");
-            croptop = activeObject.get("top");
-            cropscalex = activeObject.get("scaleX");
-            cropscaley = activeObject.get("scaleY");
-          }
-          crop(canvas.getItemById("cropped"));
-          return;
-        }
         if(activeObject.id === 'croppingRect') checkBoundariesScaling(e)
       });
       canvas.on("selection:created", function (e) {
         activeObject = e.target;
+        console.log('selection:created')
+        if(e?.selected[0].type === 'textbox'){
+          document.querySelector('#rotate').classList.add('none')
+          document.querySelector('#crop').classList.add('none')
+          document.querySelector('#draw').classList.add('none')
+          document.querySelector('#addText').classList.add('none')
+          document.querySelector('.undo-redo-options').classList.add('none')
+          document.querySelector('.text-options').classList.remove('none')
+        }
       });
       canvas.on("selection:updated", function (e) {
         activeObject = e.target;
+        console.log('selection:updated')
         if (e.deselected && e.deselected[0].id == "crop") {
           canvas.remove(e.deselected[0]).renderAll();
+        }
+        if(e?.selected[0].type === 'textbox'){
+          document.querySelector('#rotate').classList.add('none')
+          document.querySelector('#crop').classList.add('none')
+          document.querySelector('#draw').classList.add('none')
+          document.querySelector('#addText').classList.add('none')
+          document.querySelector('.undo-redo-options').classList.add('none')
+          document.querySelector('.text-options').classList.remove('none')
         }
       });
       canvas.on("selection:cleared", function (e) {
         activeObject = e.target;
-
-        if (e.deselected && e.deselected[0].id == "crop") {
-          crop(croppableImage);
-        }
+        document.querySelector('#rotate').classList.remove('none')
+        document.querySelector('#crop').classList.remove('none')
+        document.querySelector('#draw').classList.remove('none')
+        document.querySelector('#addText').classList.remove('none')
+        document.querySelector('.undo-redo-options').classList.remove('none')
+        document.querySelector('.text-options').classList.add('none')
+        document.querySelector('.crop-options').classList.add('none')
       });
 
     })();
@@ -426,16 +200,16 @@
       canvas.setHeight(activeObject.height * activeObject.scaleY);
       canvas.centerObject(activeObject)
       addCropRect();
-      // canvas.renderAll();
-      // cropImage();
+
+      document.querySelector('#rotate').classList.toggle('none')
+      document.querySelector('#crop').classList.toggle('none')
+      document.querySelector('#draw').classList.toggle('none')
+      document.querySelector('#addText').classList.toggle('none')
+      document.querySelector('.crop-options').classList.toggle('none')
     })
     document.querySelector(`#crop-done`).addEventListener('click', (e) => {
-      cropImage2();
+      cropImage();
       fitImageOnScreen()
-      if (activeObject && activeObject.id == "crop") {
-        crop(croppableImage);
-        fitImageOnScreen()
-      }
     })
   }
 
