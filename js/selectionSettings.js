@@ -1,0 +1,68 @@
+/**
+ * initialize selection setting panel
+ */
+(function () {
+  'use strict';
+  var selectionSettings = function () {
+    const _self = this;
+
+    (() => {
+
+      document.querySelector(`#rotate`).addEventListener('click', function (e) {
+        const image = _self.canvas.getItemById('image')
+        if(!image) return
+
+        image.angle += 90;
+        const isRotated90 = (image.angle % 360 === 90 || image.angle % 360 === 270);
+        const currentImgWidth = isRotated90 ? image.height : image.width;
+        const currentImgHeight = isRotated90 ? image.width : image.height;
+
+        const scaleX = window.innerWidth / currentImgWidth;
+        const scaleY = (window.innerHeight * 0.9) / currentImgHeight;
+        const scale = Math.min(scaleX, scaleY); // Use the smaller scale to ensure the image fits both dimensions
+        image.scale(scale);
+        _self.canvas.setWidth(currentImgWidth*scale);
+        _self.canvas.setHeight(currentImgHeight*scale);
+        _self.canvas.centerObject(image)
+        _self.canvas.renderAll();
+      })
+      document.querySelector(`#addText`).addEventListener('click', function (e) {
+        const image = _self.canvas.getItemById('image')
+        if(!image) return
+        const text = new fabric.Textbox('text here');
+        _self.canvas.add(text);
+      })
+
+      document.querySelector("#changeTextColor").addEventListener("input", function(event) {
+        const selectedColor = event.target.value;
+        _self.canvas.getActiveObject().set({fill:selectedColor,dirty:true})
+      });
+      document.querySelector("#changeTextBGColor").addEventListener("input", function(event) {
+        const selectedColor = event.target.value;
+        _self.canvas.getActiveObject().set({backgroundColor :selectedColor,dirty:true})
+      });
+      document.querySelector("#draw").addEventListener("click", function(event) {
+        _self.canvas.isDrawingMode = true
+        _self.canvas.freeDrawingBrush.width = 10
+        _self.history.addToHistory();
+      });
+
+
+      document.querySelector(`#undo`).addEventListener('click', function (e) {
+        _self.history.undo()
+      })
+      document.querySelector(`#redo`).addEventListener('click', function (e) {
+        _self.history.redo()
+      })
+
+
+
+
+    })();
+
+
+    // end effect section
+  }
+
+  window.ImageEditor.prototype.initializeSelectionSettings = selectionSettings;
+})()

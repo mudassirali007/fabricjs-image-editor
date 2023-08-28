@@ -1,0 +1,31 @@
+body {
+    margin: 0;
+}
+
+.canvas-container {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAHUlEQVQ4jWNgYGAQIYAJglEDhoUBg9+FowbQ2gAARjwKARjtnN8AAAAASUVORK5CYII=");
+    background-size: 30px 30px;
+
+}
+.aside-container {
+    display: flex;
+    align-items: center;
+    height: 10vh;
+}
+
+/* Reset default button styles */
+.upload-label {
+    padding: 4px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+/* Styling for button hover state */
+.upload-label:hover {
+    background-color: #45a049; /* Darker shade of green */
+}
