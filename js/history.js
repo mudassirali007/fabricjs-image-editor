@@ -30,17 +30,42 @@
             }
             historyInit = () => {
                 this.canvas.on({
-                    "path:created": this.addToHistory,
+                    "path:created": this.pathCreated,
                 });
             };
+            pathCreated = (e) => {
+                if(canvas.freeDrawingBrush.inverted) this.blurPath(e)
+                if (e?.path) e.path.selectable = false;
+                this.addToHistory()
+            };
+            blurPath = (options) => {
+                const path = options.path;
+
+                path.cloneAsImage(function(image) {
+
+                    const img = new fabric.Image(image.getElement(), {
+                        left: path.left,
+                        top: path.top,
+                    });
+
+                    // Apply the blur filter to the image
+                    img.filters.push(new fabric.Image.filters.Blur({
+                        blur: 3 // you can adjust the value
+                    }));
+
+                    img.applyFilters();
+
+                    // Add the blurred image to the canvas and remove the original path
+                    canvas.add(img);
+                    canvas.remove(path);
+                });
+            }
             clearUndoRedoHistory = () => {
                 this.undoArray = [];
                 this.redoArray = [];
             };
-            addToHistory = (e) => {
-                console.log('in addToHistory')
+            addToHistory = () => {
                 this.redoArray = [];
-                if (e?.path) e.path.selectable = false;
                 this.undoArray.push(JSON.stringify(this.canvas.toDatalessJSON(this.props)));
             };
             undo = () => {

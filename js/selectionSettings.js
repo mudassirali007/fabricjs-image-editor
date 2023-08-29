@@ -46,29 +46,78 @@
         _self.canvas.renderAll();
         _self.history.addToHistory();
       });
+      document.querySelector("#removeTextBGColor").addEventListener("click", function(event) {
+        _self.canvas.getActiveObject().set({backgroundColor :'',dirty:true})
+        _self.canvas.renderAll();
+        _self.history.addToHistory();
+      });
+
+      // Add event listener
+      document.querySelector("#font-family").addEventListener("change", function(event) {
+        // Log the selected value to the console
+        const selectedFontFamily = event.target.value.toLowerCase();
+        _self.canvas.getActiveObject().set({fontFamily :selectedFontFamily,dirty:true})
+        _self.canvas.renderAll();
+        _self.history.addToHistory();
+      });
+
 
       document.querySelector("#draw").addEventListener("click", function(event) {
         _self.canvas.isDrawingMode = true
-        _self.canvas.freeDrawingBrush.width = 10
+        _self.canvas.freeDrawingBrush = new fabric.PencilBrush(_self.canvas);
+        _self.canvas.freeDrawingBrush.width = parseInt(document.querySelector("#draw-width").value)
         _self.history.addToHistory();
         document.querySelector('#rotate').classList.toggle('none')
         document.querySelector('#crop').classList.toggle('none')
         document.querySelector('#draw').classList.toggle('none')
         document.querySelector('#addText').classList.toggle('none')
-        document.querySelector('.undo-redo-options').classList.toggle('none')
+        // document.querySelector('.undo-redo-options').classList.toggle('none')
         document.querySelector('.draw-options').classList.toggle('none')
 
       });
+
+      document.querySelector(`#draw-blur`).addEventListener('click', (e) => {
+        const enabled = Boolean(parseInt(e.target.getAttribute('enabled')))
+        if(!enabled){
+          e.target.textContent = 'Disable Blur'
+          e.target.setAttribute('enabled',1)
+          _self.canvas.freeDrawingBrush = new fabric.EraserBrush(_self.canvas);
+          _self.canvas.freeDrawingBrush.inverted = true;
+        } else {
+          e.target.textContent = 'Enable Blur'
+          e.target.setAttribute('enabled',0)
+          _self.canvas.freeDrawingBrush = new fabric.PencilBrush(_self.canvas);
+          _self.canvas.freeDrawingBrush.inverted = false;
+        }
+        _self.canvas.freeDrawingBrush.width = parseInt(document.querySelector("#draw-width").value)
+
+
+      })
+
+      document.querySelector("#draw-color").addEventListener("input", function(event) {
+        const selectedColor = event.target.value;
+        _self.canvas.freeDrawingBrush.color = selectedColor
+        _self.canvas.renderAll();
+        _self.history.addToHistory();
+      });
+
+      document.querySelector("#draw-width").addEventListener("input", function(event) {
+        const selectedValue = event.target.value;
+        event.target.previousSibling.textContent = `${selectedValue}`;
+        _self.canvas.freeDrawingBrush.width = parseInt(selectedValue)
+        _self.canvas.renderAll();
+        _self.history.addToHistory();
+      });
+
+
       document.querySelector(`#draw-done`).addEventListener('click', (e) => {
         _self.canvas.isDrawingMode = false
         document.querySelector('#rotate').classList.toggle('none')
         document.querySelector('#crop').classList.toggle('none')
         document.querySelector('#draw').classList.toggle('none')
         document.querySelector('#addText').classList.toggle('none')
-        document.querySelector('.undo-redo-options').classList.toggle('none')
+        // document.querySelector('.undo-redo-options').classList.toggle('none')
         document.querySelector('.draw-options').classList.add('none')
-
-
       })
 
       document.querySelector(`#undo`).addEventListener('click', function (e) {

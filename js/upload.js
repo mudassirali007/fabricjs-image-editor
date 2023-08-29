@@ -38,6 +38,7 @@
               ogHeight: img.height,
               ogScaleX: scale,
               ogScaleY: scale,
+              // erasable: false,
             });
             canvas.setWidth(img.width*scale);
             canvas.setHeight(img.height*scale);
