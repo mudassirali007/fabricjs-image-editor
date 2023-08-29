@@ -11,6 +11,13 @@
              redoArray= [];
              props = [
                 `erasable`,
+                `id`,
+                `width`,
+                `height`,
+                `ogWidth`,
+                `ogHeight`,
+                `ogScaleX`,
+                `ogScaleY`,
                 `path`,
                 `eraser`,
                 `selectable`,
@@ -24,8 +31,6 @@
             historyInit = () => {
                 this.canvas.on({
                     "path:created": this.addToHistory,
-                    "object:modified": this.addToHistory,
-                    "selection:updated": this.addToHistory,
                 });
             };
             clearUndoRedoHistory = () => {
@@ -33,6 +38,7 @@
                 this.redoArray = [];
             };
             addToHistory = (e) => {
+                console.log('in addToHistory')
                 this.redoArray = [];
                 if (e?.path) e.path.selectable = false;
                 this.undoArray.push(JSON.stringify(this.canvas.toDatalessJSON(this.props)));

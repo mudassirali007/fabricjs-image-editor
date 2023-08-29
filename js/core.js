@@ -27,9 +27,6 @@
      * Initialize image editor
      */
     this.init = () => {
-
-
-
       this.initializeSelectionSettings();
       this.canvas = this.initializeCanvas();
       window.canvas = this.canvas

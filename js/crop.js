@@ -132,6 +132,8 @@
     (() => {
       canvas.on("object:modified", function (e) {
         activeObject = e.target;
+        if(activeObject.id === 'croppingRect') return
+        _self.history.addToHistory(e)
       });
       canvas.on("object:moving", function (e) {
         activeObject = e.target;
@@ -152,6 +154,15 @@
           document.querySelector('.undo-redo-options').classList.add('none')
           document.querySelector('.text-options').classList.remove('none')
         }
+        if(e?.selected[0].id === 'croppingRect'){
+          document.querySelector('#rotate').classList.add('none')
+          document.querySelector('#crop').classList.add('none')
+          document.querySelector('#draw').classList.add('none')
+          document.querySelector('#addText').classList.add('none')
+          document.querySelector('.undo-redo-options').classList.add('none')
+          document.querySelector('.crop-options').classList.add('none')
+          document.querySelector('.crop-options').classList.remove('none')
+        }
       });
       canvas.on("selection:updated", function (e) {
         activeObject = e.target;
@@ -165,7 +176,19 @@
           document.querySelector('#draw').classList.add('none')
           document.querySelector('#addText').classList.add('none')
           document.querySelector('.undo-redo-options').classList.add('none')
+          document.querySelector('.crop-options').classList.add('none')
           document.querySelector('.text-options').classList.remove('none')
+        }
+        if(e?.selected[0].id === 'croppingRect'){
+          document.querySelector('#rotate').classList.add('none')
+          document.querySelector('#crop').classList.add('none')
+          document.querySelector('#draw').classList.add('none')
+          document.querySelector('#addText').classList.add('none')
+          document.querySelector('.undo-redo-options').classList.add('none')
+          document.querySelector('.text-options').classList.add('none')
+          document.querySelector('.draw-options').classList.add('none')
+          document.querySelector('.crop-options').classList.remove('none')
+
         }
       });
       canvas.on("selection:cleared", function (e) {
@@ -182,11 +205,13 @@
     })();
 
 
-
     document.querySelector(`#crop`).addEventListener('click', (e) => {
+      if(canvas.getItemById('croppingRect')) return
+      // _self.history.addToHistory();
       activeObject = canvas.getItemById('image');
       activeObject
           .set({
+            id: 'image',
             cropX: 0,
             cropY: 0,
             angle: 0,
@@ -209,8 +234,15 @@
       document.querySelector('.crop-options').classList.toggle('none')
     })
     document.querySelector(`#crop-done`).addEventListener('click', (e) => {
+      document.querySelector('#rotate').classList.toggle('none')
+      document.querySelector('#crop').classList.toggle('none')
+      document.querySelector('#draw').classList.toggle('none')
+      document.querySelector('#addText').classList.toggle('none')
+      document.querySelector('.undo-redo-options').classList.toggle('none')
+      document.querySelector('.crop-options').classList.toggle('none')
       cropImage();
       fitImageOnScreen()
+      // _self.history.addToHistory();
     })
   }
 

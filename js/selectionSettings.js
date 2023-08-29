@@ -31,12 +31,6 @@
         const text = new fabric.Textbox('text here');
         _self.canvas.add(text);
         _self.history.addToHistory();
-        document.querySelector('#rotate').classList.toggle('none')
-        document.querySelector('#crop').classList.toggle('none')
-        document.querySelector('#draw').classList.toggle('none')
-        document.querySelector('#addText').classList.toggle('none')
-        document.querySelector('.undo-redo-options').classList.toggle('none')
-        document.querySelector('.text-options').classList.toggle('none')
 
       })
 

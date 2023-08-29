@@ -10,6 +10,8 @@
       if (files.length === 0) return;
       const allowedTypes = ['image/jpeg', 'image/png', 'image/svg+xml']
       canvas.clear()
+      _self.history.clearUndoRedoHistory();
+
       for (let file of files) {
         // check type
         if (!allowedTypes.includes(file.type)) continue
@@ -43,7 +45,7 @@
             canvas.add(img);
             canvas.centerObject(img);
             canvas.renderAll()
-            _self.history.clearUndoRedoHistory()
+
             document.querySelector('#rotate').classList.toggle('none')
             document.querySelector('#crop').classList.toggle('none')
             document.querySelector('#draw').classList.toggle('none')
