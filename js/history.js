@@ -12,10 +12,16 @@
              props = [
                 `erasable`,
                 `id`,
+                `cropX`,
+                `cropY`,
+                `originX`,
+                `originY`,
                 `width`,
                 `height`,
                 `ogWidth`,
                 `ogHeight`,
+                `scaleX`,
+                `scaleY`,
                 `ogScaleX`,
                 `ogScaleY`,
                 `path`,
@@ -67,6 +73,7 @@
             addToHistory = () => {
                 this.redoArray = [];
                 this.undoArray.push(JSON.stringify(this.canvas.toDatalessJSON(this.props)));
+                console.log('addToHistory called',this.undoArray)
             };
             undo = () => {
                 if (this.undoArray.length > 1) {
@@ -82,9 +89,16 @@
                 }
             };
             loadFromJson = (state) => {
+                const json = JSON.parse(state);
                 this.canvas.loadFromJSON(
-                    JSON.parse(state),
-                    this.canvas.renderAll.bind(this.canvas)
+                    json, () => {
+                        this.canvas.setWidth(json.width);
+                        this.canvas.setHeight(json.height);
+                        this.canvas.renderAll.bind(this.canvas)
+                    },
+                    () => {
+
+                    }
                 );
             };
         }

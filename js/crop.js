@@ -125,6 +125,17 @@
       canvas.centerObject(activeObject);
       canvas.renderAll();
 
+      const objects = canvas.getObjects();
+      for (let obj of objects) {
+        if (obj.id !== 'image') { // Skip the image object
+          obj.set({
+            left: obj.left * scale,
+            top: obj.top * scale,
+          });
+          obj.setCoords();  // Update object's collision area
+        }
+      }
+      canvas.renderAll();
 
     }
 
@@ -207,7 +218,8 @@
 
     document.querySelector(`#crop`).addEventListener('click', (e) => {
       if(canvas.getItemById('croppingRect')) return
-      // _self.history.addToHistory();
+      _self.history.addToHistory();
+
       activeObject = canvas.getItemById('image');
       activeObject
           .set({
@@ -224,6 +236,8 @@
       canvas.setWidth(activeObject.width * activeObject.scaleX);
       canvas.setHeight(activeObject.height * activeObject.scaleY);
       canvas.centerObject(activeObject)
+
+
       addCropRect();
 
       document.querySelector('#rotate').classList.toggle('none')
@@ -240,9 +254,11 @@
       document.querySelector('#addText').classList.toggle('none')
       document.querySelector('.undo-redo-options').classList.toggle('none')
       document.querySelector('.crop-options').classList.toggle('none')
+
       cropImage();
-      fitImageOnScreen()
       // _self.history.addToHistory();
+      fitImageOnScreen()
+      _self.history.addToHistory();
     })
   }
 
