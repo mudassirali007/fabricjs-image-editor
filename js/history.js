@@ -73,7 +73,6 @@
             addToHistory = () => {
                 this.redoArray = [];
                 this.undoArray.push(JSON.stringify(this.canvas.toDatalessJSON(this.props)));
-                console.log('addToHistory called',this.undoArray)
             };
             undo = () => {
                 if (this.undoArray.length > 1) {
