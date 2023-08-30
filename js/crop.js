@@ -41,13 +41,14 @@
       obj.setCoords();
       // top-left  corner
       if(obj.getBoundingRect().top < 0 || obj.getBoundingRect().left < 0){
-        obj.top = Math.max(obj.top, obj.top-obj.getBoundingRect().top);
-        obj.left = Math.max(obj.left, obj.left-obj.getBoundingRect().left);
+        obj.top = Math.max(obj.top, obj.top-obj.getBoundingRect().top) - 0.001;
+        obj.left = Math.max(obj.left, obj.left-obj.getBoundingRect().left)  - 0.001;
       }
       // bot-right corner
       if(obj.getBoundingRect().top+obj.getBoundingRect().height  > obj.canvas.height || obj.getBoundingRect().left+obj.getBoundingRect().width  > obj.canvas.width){
-        obj.top = Math.min(obj.top, obj.canvas.height-obj.getBoundingRect().height+obj.top-obj.getBoundingRect().top);
-        obj.left = Math.min(obj.left, obj.canvas.width-obj.getBoundingRect().width+obj.left-obj.getBoundingRect().left);
+        obj.top = Math.min(obj.top, obj.canvas.height-obj.getBoundingRect().height+obj.top-obj.getBoundingRect().top) - 0.001;
+        obj.left = Math.min(obj.left, obj.canvas.width-obj.getBoundingRect().width+obj.left-obj.getBoundingRect().left) - 0.001;
+
       }
 
       canvas.renderAll();
@@ -60,6 +61,7 @@
     let height1 = 0 ;
     const checkBoundariesScaling = (event) => {
       let obj = event.target;
+
       obj.setCoords();
       let brNew = obj.getBoundingRect();
 
@@ -172,11 +174,6 @@
 
       // Rotate the image
       image.angle += 90;
-      // image.setCoords();
-
-      // const isRotated90 = (image.angle % 360 === 90 || image.angle % 360 === 270);
-      // const currentImgWidth = isRotated90 ? image.getScaledHeight() : image.getScaledWidth();
-      // const currentImgHeight = isRotated90 ? image.getScaledWidth() : image.getScaledHeight();
 
       const isRotated90 = (image.angle % 360 === 90 || image.angle % 360 === 270);
       const currentImgWidth = isRotated90 ? image.height : image.width;
@@ -246,7 +243,6 @@
       });
       canvas.on("selection:created", function (e) {
         activeObject = e.target;
-        console.log('selection:created')
         if(e?.selected[0].type === 'textbox'){
           document.querySelector('#rotate').classList.add('none')
           document.querySelector('#crop').classList.add('none')
@@ -267,7 +263,6 @@
       });
       canvas.on("selection:updated", function (e) {
         activeObject = e.target;
-        console.log('selection:updated')
         if (e.deselected && e.deselected[0].id == "crop") {
           canvas.remove(e.deselected[0]).renderAll();
         }
