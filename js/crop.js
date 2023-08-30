@@ -125,18 +125,6 @@
       canvas.centerObject(activeObject);
       canvas.renderAll();
 
-      const objects = canvas.getObjects();
-      for (let obj of objects) {
-        if (obj.id !== 'image') { // Skip the image object
-          obj.set({
-            left: obj.left * scale,
-            top: obj.top * scale,
-          });
-          obj.setCoords();  // Update object's collision area
-        }
-      }
-      canvas.renderAll();
-
     }
 
 
