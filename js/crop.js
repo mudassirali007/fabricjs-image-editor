@@ -103,6 +103,8 @@
       let cropHeight = croppingRect.height * croppingRect.scaleY / scaleY;
 
       image.set({
+        left: imgActualLeft + (cropX * scaleX) + (croppingRect.width * croppingRect.scaleX / 2),
+        top: imgActualTop + (cropY * scaleY) + (croppingRect.height * croppingRect.scaleY / 2),
         cropX: cropX,
         cropY: cropY,
         width: cropWidth,
@@ -110,23 +112,123 @@
       });
 
       // Update the image on the canvas to show the cropped version
-      canvas.remove(croppingRect);
+      // canvas.remove(croppingRect);
       canvas.renderAll();
     };
-
     function fitImageOnScreen(){
-      activeObject = canvas.getItemById('image')
+
+      const activeObject = canvas.getItemById('image');
+      const croppingRect = canvas.getItemById('croppingRect'); // Get cropping rectangle
+
+      const originalScaleX = activeObject.scaleX;
+      const originalScaleY = activeObject.scaleY;
+
+      // Calculate new scaling factors for fitting the image on screen
       const scaleX = window.innerWidth / activeObject.width;
       const scaleY = (window.innerHeight * 0.9) / activeObject.height;
-      const scale = Math.min(scaleX, scaleY); // Use the smaller scale to ensure the image fits both dimensions
-      activeObject.scale(scale);
-      canvas.setWidth(activeObject.width*scale);
-      canvas.setHeight(activeObject.height*scale);
-      canvas.centerObject(activeObject);
-      canvas.renderAll();
+      const scale = Math.min(scaleX, scaleY);
 
+      // Scale and reposition the image
+      activeObject.scale(scale);
+      canvas.setWidth(activeObject.width * scale);
+      canvas.setHeight(activeObject.height * scale);
+      canvas.centerObject(activeObject);
+
+      const objects = canvas.getObjects();
+
+      for (let obj of objects) {
+        if (obj.id !== 'image' && obj.id !== 'croppingRect') {
+
+          // Calculate the relative position and scale of the object within the cropping rectangle before cropping
+          const relativeLeft = (obj.left - croppingRect.left) / (croppingRect.width * croppingRect.scaleX);
+          const relativeTop = (obj.top - croppingRect.top) / (croppingRect.height * croppingRect.scaleY);
+
+          // Calculate new absolute positions based on the relative positions and the new size and position of the image
+          const newLeft = activeObject.left + (relativeLeft * activeObject.width * activeObject.scaleX);
+          const newTop = activeObject.top + (relativeTop * activeObject.height * activeObject.scaleY);
+
+          // Set new positions and scale for the object
+          obj.set({
+            left: newLeft,
+            top: newTop,
+            scaleX: obj.scaleX * (scale / originalScaleX),
+            scaleY: obj.scaleY * (scale / originalScaleY),
+            ogLeft: obj.left,
+            ogTop: obj.top,
+            ogScaleX: obj.scaleX,
+            ogScaleY: obj.scaleY,
+          });
+
+          // obj.scale(scale);
+          obj.setCoords();
+        }
+      }
+      canvas.remove(croppingRect);
+      canvas.renderAll();
     }
 
+    function rotateAndFitImageOnScreen() {
+      const image = canvas.getItemById('image');
+
+      // Rotate the image
+      image.angle += 90;
+      // image.setCoords();
+
+      // const isRotated90 = (image.angle % 360 === 90 || image.angle % 360 === 270);
+      // const currentImgWidth = isRotated90 ? image.getScaledHeight() : image.getScaledWidth();
+      // const currentImgHeight = isRotated90 ? image.getScaledWidth() : image.getScaledHeight();
+
+      const isRotated90 = (image.angle % 360 === 90 || image.angle % 360 === 270);
+      const currentImgWidth = isRotated90 ? image.height : image.width;
+      const currentImgHeight = isRotated90 ? image.width : image.height;
+
+      const scaleX = window.innerWidth / currentImgWidth;
+      const scaleY = (window.innerHeight * 0.9) / currentImgHeight;
+      const scale = Math.min(scaleX, scaleY);
+      image.scale(scale);
+      const newCanvasWidth = currentImgWidth * scale;
+      const newCanvasHeight = currentImgHeight * scale;
+
+      // Store the canvas center coordinates before resizing
+      const oldCenterX = canvas.width / 2;
+      const oldCenterY = canvas.height / 2;
+
+      // Resize canvas and recenter image
+      canvas.setWidth(newCanvasWidth);
+      canvas.setHeight(newCanvasHeight);
+      canvas.centerObject(image);
+      canvas.renderAll();
+
+      // Calculate the new canvas center coordinates
+      const newCenterX = canvas.width / 2;
+      const newCenterY = canvas.height / 2;
+
+      // Update positions of all other objects
+      const objects = canvas.getObjects();
+      for (let obj of objects) {
+        if (obj.id !== 'image') {
+          const vecOld = { x: obj.left - oldCenterX, y: obj.top - oldCenterY };
+          const vecNew = {
+            x: vecOld.x * Math.cos(Math.PI / 2) - vecOld.y * Math.sin(Math.PI / 2),
+            y: vecOld.x * Math.sin(Math.PI / 2) + vecOld.y * Math.cos(Math.PI / 2),
+          };
+
+          obj.set({
+            left: vecNew.x + newCenterX,
+            top: vecNew.y + newCenterY,
+            angle: (obj.angle + 90) % 360,
+            ogAngle: obj.angle,
+            ogLeft: obj.left,
+            ogTop: obj.top,
+            ogScaleX: obj.scaleX,
+            ogScaleY: obj.scaleY,
+          }).setCoords();
+        }
+      }
+
+      // Render the canvas to see the changes
+      canvas.renderAll();
+    }
 
     (() => {
       canvas.on("object:modified", function (e) {
@@ -224,7 +326,23 @@
       canvas.setWidth(activeObject.width * activeObject.scaleX);
       canvas.setHeight(activeObject.height * activeObject.scaleY);
       canvas.centerObject(activeObject)
+      const objects = canvas.getObjects();
 
+      for (let obj of objects) {
+        if (obj.id !== 'image' && obj.id !== 'croppingRect') {
+          obj.set({
+            left: obj?.ogLeft ?? obj.left,
+            top: obj?.ogTop ?? obj.top,
+            scaleX: obj?.ogScaleX ?? obj.scaleX,
+            scaleY: obj?.ogScaleY ?? obj.scaleY,
+            angle: obj?.ogAngle ?? obj.angle,
+          });
+
+          obj.setCoords();
+        }
+      }
+
+      canvas.renderAll();
 
       addCropRect();
 
@@ -244,9 +362,13 @@
       document.querySelector('.crop-options').classList.toggle('none')
 
       cropImage();
-      // _self.history.addToHistory();
       fitImageOnScreen()
       _self.history.addToHistory();
+    })
+    document.querySelector(`#rotate`).addEventListener('click', function (e) {
+      if(!canvas.getItemById('image')) return
+      rotateAndFitImageOnScreen()
+
     })
   }
 
