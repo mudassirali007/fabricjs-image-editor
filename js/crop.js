@@ -169,13 +169,13 @@
       canvas.renderAll();
     }
 
-    function rotateAndFitImageOnScreen() {
+    function rotateAndFitImageOnScreen(angle) {
       const image = canvas.getItemById('image');
 
       // Rotate the image
-      image.angle += 90;
-
+      image.angle = (image.angle + angle) % 360;
       const isRotated90 = (image.angle % 360 === 90 || image.angle % 360 === 270);
+
       const currentImgWidth = isRotated90 ? image.height : image.width;
       const currentImgHeight = isRotated90 ? image.width : image.height;
 
@@ -205,15 +205,16 @@
       for (let obj of objects) {
         if (obj.id !== 'image') {
           const vecOld = { x: obj.left - oldCenterX, y: obj.top - oldCenterY };
+          const angleInRadians = angle * (Math.PI / 180);
           const vecNew = {
-            x: vecOld.x * Math.cos(Math.PI / 2) - vecOld.y * Math.sin(Math.PI / 2),
-            y: vecOld.x * Math.sin(Math.PI / 2) + vecOld.y * Math.cos(Math.PI / 2),
+            x: vecOld.x * Math.cos(angleInRadians) - vecOld.y * Math.sin(angleInRadians),
+            y: vecOld.x * Math.sin(angleInRadians) + vecOld.y * Math.cos(angleInRadians),
           };
 
           obj.set({
             left: vecNew.x + newCenterX,
             top: vecNew.y + newCenterY,
-            angle: (obj.angle + 90) % 360,
+            angle: (obj.angle + angle) % 360,
             ogAngle: obj.angle,
             ogLeft: obj.left,
             ogTop: obj.top,
@@ -244,7 +245,8 @@
       canvas.on("selection:created", function (e) {
         activeObject = e.target;
         if(e?.selected[0].type === 'textbox'){
-          document.querySelector('#rotate').classList.add('none')
+          document.querySelector('#rotate-left').classList.add('none')
+          document.querySelector('#rotate-right').classList.add('none')
           document.querySelector('#crop').classList.add('none')
           document.querySelector('#draw').classList.add('none')
           document.querySelector('#addText').classList.add('none')
@@ -252,7 +254,8 @@
           document.querySelector('.text-options').classList.remove('none')
         }
         if(e?.selected[0].id === 'croppingRect'){
-          document.querySelector('#rotate').classList.add('none')
+          document.querySelector('#rotate-left').classList.add('none')
+          document.querySelector('#rotate-right').classList.add('none')
           document.querySelector('#crop').classList.add('none')
           document.querySelector('#draw').classList.add('none')
           document.querySelector('#addText').classList.add('none')
@@ -267,7 +270,8 @@
           canvas.remove(e.deselected[0]).renderAll();
         }
         if(e?.selected[0].type === 'textbox'){
-          document.querySelector('#rotate').classList.add('none')
+          document.querySelector('#rotate-left').classList.add('none')
+          document.querySelector('#rotate-right').classList.add('none')
           document.querySelector('#crop').classList.add('none')
           document.querySelector('#draw').classList.add('none')
           document.querySelector('#addText').classList.add('none')
@@ -276,7 +280,8 @@
           document.querySelector('.text-options').classList.remove('none')
         }
         if(e?.selected[0].id === 'croppingRect'){
-          document.querySelector('#rotate').classList.add('none')
+          document.querySelector('#rotate-left').classList.add('none')
+          document.querySelector('#rotate-right').classList.add('none')
           document.querySelector('#crop').classList.add('none')
           document.querySelector('#draw').classList.add('none')
           document.querySelector('#addText').classList.add('none')
@@ -289,7 +294,8 @@
       });
       canvas.on("selection:cleared", function (e) {
         activeObject = e.target;
-        document.querySelector('#rotate').classList.remove('none')
+        document.querySelector('#rotate-left').classList.remove('none')
+        document.querySelector('#rotate-right').classList.remove('none')
         document.querySelector('#crop').classList.remove('none')
         document.querySelector('#draw').classList.remove('none')
         document.querySelector('#addText').classList.remove('none')
@@ -341,7 +347,8 @@
 
       addCropRect();
 
-      document.querySelector('#rotate').classList.toggle('none')
+      document.querySelector('#rotate-left').classList.toggle('none')
+      document.querySelector('#rotate-right').classList.toggle('none')
       document.querySelector('#crop').classList.toggle('none')
       document.querySelector('#draw').classList.toggle('none')
       document.querySelector('#addText').classList.toggle('none')
@@ -349,7 +356,8 @@
       document.querySelector('.crop-options').classList.toggle('none')
     })
     document.querySelector(`#crop-done`).addEventListener('click', (e) => {
-      document.querySelector('#rotate').classList.toggle('none')
+      document.querySelector('#rotate-left').classList.toggle('none')
+      document.querySelector('#rotate-right').classList.toggle('none')
       document.querySelector('#crop').classList.toggle('none')
       document.querySelector('#draw').classList.toggle('none')
       document.querySelector('#addText').classList.toggle('none')
@@ -360,9 +368,14 @@
       fitImageOnScreen()
       _self.history.addToHistory();
     })
-    document.querySelector(`#rotate`).addEventListener('click', function (e) {
+    document.querySelector(`#rotate-right`).addEventListener('click', function (e) {
       if(!canvas.getItemById('image')) return
-      rotateAndFitImageOnScreen()
+      rotateAndFitImageOnScreen(90)
+
+    })
+    document.querySelector(`#rotate-left`).addEventListener('click', function (e) {
+      if(!canvas.getItemById('image')) return
+      rotateAndFitImageOnScreen(270)
 
     })
   }
