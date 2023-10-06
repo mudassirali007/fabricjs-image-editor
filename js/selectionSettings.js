@@ -10,10 +10,11 @@
 
       document.querySelector(`#addText`).addEventListener('click', function (e) {
         _self.history.addToHistory();
-        const text = new fabric.Textbox('text here');
-        _self.canvas.add(text);
+        const text = new fabric.Textbox('text here',{
+          editingBorderColor : '#008000'
+        });
+        _self.canvas.add(text).renderAll();
         _self.history.addToHistory();
-
       })
 
       document.querySelector("#changeTextColor").addEventListener("input", function(event) {
@@ -49,6 +50,7 @@
         _self.canvas.freeDrawingBrush = new fabric.PencilBrush(_self.canvas);
         _self.canvas.freeDrawingBrush.width = parseInt(document.querySelector("#draw-width").value)
         _self.history.addToHistory();
+        document.querySelector('#general-options').classList.toggle('none')
         document.querySelector('#rotate-left').classList.toggle('none')
         document.querySelector('#rotate-right').classList.toggle('none')
         document.querySelector('#crop').classList.toggle('none')
@@ -95,6 +97,7 @@
 
       document.querySelector(`#draw-done`).addEventListener('click', (e) => {
         _self.canvas.isDrawingMode = false
+        document.querySelector('#general-options').classList.toggle('none')
         document.querySelector('#rotate-left').classList.toggle('none')
         document.querySelector('#rotate-right').classList.toggle('none')
         document.querySelector('#crop').classList.toggle('none')

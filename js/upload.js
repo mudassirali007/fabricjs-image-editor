@@ -4,11 +4,46 @@
 (function () {
   var upload = function (canvas) {
     const _self = this;
+    const dropdown = document.querySelector('#canvasDropDown');
+    let selectedCanvas = 0;
+    let totalCanvas = 0;
+    const addNewCanvasDropDown = () => {
+      // Create a new option element
+      const newOption = document.createElement('option');
+      canvasDropDown.classList.remove('none')
+      newOption.value = `${dropdown.options.length}`;  // Set the value for the option
+      newOption.textContent = `Canvas ${dropdown.options.length+1}`;  // Set the display text for the option
+      dropdown.appendChild(newOption);
+      dropdown.selectedIndex = dropdown.options.length - 1;
+      selectedCanvas = dropdown.options.length - 1
+      totalCanvas++;
+    }
 
+    dropdown.addEventListener('change', function() {
+      let selectedValue = parseInt(this.value); // get the selected option's value (price)
+      updateCurrentCanvas();
+      _self.history.loadFromJson(_self.canvasArray[selectedValue]?.json)
+      _self.history.undoArray =  JSON.parse(_self.canvasArray[selectedValue]?.history?.undoArray) ?? []
+      _self.history.redoArray =  JSON.parse(_self.canvasArray[selectedValue]?.history?.redoArray) ?? []
+      selectedCanvas = selectedValue
 
+    });
+
+    const updateCurrentCanvas = () => {
+      if(totalCanvas){
+        _self.canvasArray[selectedCanvas] = {
+          json: JSON.stringify(canvas.toDatalessJSON(_self.history.props)),
+          history: {
+            undoArray: JSON.stringify(_self.history.undoArray),
+            redoArray: JSON.stringify(_self.history.redoArray)
+          }
+        };
+      }
+    }
     const processFiles = (files) => {
       if (files.length === 0) return;
       const allowedTypes = ['image/jpeg', 'image/png', 'image/svg+xml']
+      updateCurrentCanvas();
       canvas.clear()
       _self.history.clearUndoRedoHistory();
 
@@ -38,6 +73,7 @@
               ogHeight: img.height,
               ogScaleX: scale,
               ogScaleY: scale,
+              ogAngle: 0,
               // erasable: false,
             });
             canvas.setWidth(img.width*scale);
@@ -47,6 +83,16 @@
             canvas.centerObject(img);
             canvas.renderAll()
 
+
+            _self.canvasArray.push({
+              json: JSON.stringify(canvas.toDatalessJSON(_self.history.props)),
+              history: {
+                undoArray: JSON.stringify(_self.history.undoArray),
+                redoArray: JSON.stringify(_self.history.redoArray)
+              }
+            });
+            addNewCanvasDropDown()
+            _self.history.addToHistory();
             // document.querySelector('#rotate').classList.toggle('none')
             // document.querySelector('#crop').classList.toggle('none')
             // document.querySelector('#draw').classList.toggle('none')

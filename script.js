@@ -1,7 +1,6 @@
 try {
 
   var imgEditor = new ImageEditor();
-  console.log('initialize image editor');
 
   // let status = imgEditor.getCanvasJSON();
   // imgEditor.setCanvasStatus(status);

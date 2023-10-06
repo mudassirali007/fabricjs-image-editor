@@ -20,6 +20,7 @@
     ];
 
     this.canvas = null;
+    this.canvasArray = [];
     this.history = null;
 
 
@@ -32,6 +33,7 @@
       window.canvas = this.canvas
       this.initializeUpload(this.canvas);
       this.initializeCrop(this.canvas);
+      this.initializeEmoji(this.canvas);
       this.history = this.initializeHistory(this.canvas);
     };
 
