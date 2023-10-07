@@ -16,7 +16,8 @@
 
     this.propsToSave = [
         `preserveObjectStacking`,
-        `animation`
+        `animation`,
+        `_controlsVisibility`,
     ];
 
     this.canvas = null;

@@ -4,10 +4,7 @@
 (function () {
     var crop = function (canvas) {
         const _self = this;
-
-
         let activeObject;
-
 
         const addCropRect = () => {
             const image = canvas.getItemById('image');
@@ -86,6 +83,16 @@
         }
 
         // Function to crop the image
+        const rotatePoint = (x, y, cx, cy, angle) => {
+            const angleRad = (angle * Math.PI) / 180;
+            const cos = Math.cos(angleRad);
+            const sin = Math.sin(angleRad);
+
+            const nx = (cos * (x - cx)) - (sin * (y - cy)) + cx;
+            const ny = (cos * (y - cy)) + (sin * (x - cx)) + cy;
+
+            return { x: nx, y: ny };
+        };
         const cropImage = () => {
             const image = canvas.getItemById('image');
             const croppingRect = canvas.getItemById('croppingRect');
@@ -93,30 +100,44 @@
             let scaleX = image.scaleX;
             let scaleY = image.scaleY;
 
-            // Calculate the actual top-left position of the image and croppingRect on the canvas
+            // Calculate the actual top-left position of the image
             const imgActualLeft = image.left - (image.width * scaleX) / 2;
             const imgActualTop = image.top - (image.height * scaleY) / 2;
 
-            const rectActualLeft = croppingRect.left - (croppingRect.width * croppingRect.scaleX) / 2;
-            const rectActualTop = croppingRect.top - (croppingRect.height * croppingRect.scaleY) / 2;
+            // Calculate the relative position of the rectangle's top-left to the image's center
+            const relRectLeft = croppingRect.left - image.left;
+            const relRectTop = croppingRect.top - image.top;
 
-            // Now, calculate the position of the cropping rectangle relative to the image
+            // Rotate this relative position by the negative of the image's rotation angle
+            const rotatedPoint = rotatePoint(relRectLeft, relRectTop, 0, 0, -image.angle);
+
+            // Calculate the actual top-left position of the rectangle in the unrotated frame
+            const rectActualLeft = image.left + rotatedPoint.x - (croppingRect.width * croppingRect.scaleX) / 2;
+            const rectActualTop = image.top + rotatedPoint.y - (croppingRect.height * croppingRect.scaleY) / 2;
+
+            // Calculate the cropping coordinates
             let cropX = (rectActualLeft - imgActualLeft) / scaleX;
             let cropY = (rectActualTop - imgActualTop) / scaleY;
             let cropWidth = croppingRect.width * croppingRect.scaleX / scaleX;
             let cropHeight = croppingRect.height * croppingRect.scaleY / scaleY;
 
+            // Calculate the center of the cropped region relative to the original image's coordinates
+            const croppedCenterX = cropX + cropWidth / 2;
+            const croppedCenterY = cropY + cropHeight / 2;
+
+            // Adjust the image's position to make the cropped image appear centered on the canvas
+            const newLeft = image.left + (croppedCenterX - image.width / 2) * scaleX;
+            const newTop = image.top + (croppedCenterY - image.height / 2) * scaleY;
+
             image.set({
-                left: imgActualLeft + (cropX * scaleX) + (croppingRect.width * croppingRect.scaleX / 2),
-                top: imgActualTop + (cropY * scaleY) + (croppingRect.height * croppingRect.scaleY / 2),
+                left: newLeft,
+                top: newTop,
                 cropX: cropX,
                 cropY: cropY,
                 width: cropWidth,
                 height: cropHeight
             });
 
-            // Update the image on the canvas to show the cropped version
-            // canvas.remove(croppingRect);
             canvas.renderAll();
         };
         function fitImageOnScreen(){
@@ -124,18 +145,25 @@
             const activeObject = canvas.getItemById('image');
             const croppingRect = canvas.getItemById('croppingRect'); // Get cropping rectangle
 
+            const isRotated90 = (activeObject.angle % 360 === 90 || activeObject.angle % 360 === 270);
+
+            const currentImgWidth = isRotated90 ? activeObject.height : activeObject.width;
+            const currentImgHeight = isRotated90 ? activeObject.width : activeObject.height;
+
             const originalScaleX = activeObject.scaleX;
             const originalScaleY = activeObject.scaleY;
 
             // Calculate new scaling factors for fitting the image on screen
-            const scaleX = window.innerWidth / activeObject.width;
-            const scaleY = (window.innerHeight * 0.9) / activeObject.height;
+            const scaleX = window.innerWidth / currentImgWidth;
+            const scaleY = (window.innerHeight * 0.9) / currentImgHeight;
             const scale = Math.min(scaleX, scaleY);
+            const newCanvasWidth = currentImgWidth * scale;
+            const newCanvasHeight = currentImgHeight * scale;
 
             // Scale and reposition the image
             activeObject.scale(scale);
-            canvas.setWidth(activeObject.width * scale);
-            canvas.setHeight(activeObject.height * scale);
+            canvas.setWidth(newCanvasWidth);
+            canvas.setHeight(newCanvasHeight);
             canvas.centerObject(activeObject);
 
             const objects = canvas.getObjects();
@@ -247,8 +275,7 @@
             canvas.on("selection:created", function (e) {
                 activeObject = e.target;
                 if(e?.selected[0].type === 'textbox'){
-                    document.querySelector('#rotate-left').classList.add('none')
-                    document.querySelector('#rotate-right').classList.add('none')
+                    document.querySelector('#general-options').classList.add('none')
                     document.querySelector('#crop').classList.add('none')
                     document.querySelector('#draw').classList.add('none')
                     document.querySelector('#addText').classList.add('none')
@@ -256,8 +283,7 @@
                     document.querySelector('.text-options').classList.remove('none')
                 }
                 if(e?.selected[0].id === 'croppingRect'){
-                    document.querySelector('#rotate-left').classList.add('none')
-                    document.querySelector('#rotate-right').classList.add('none')
+                    document.querySelector('#general-options').classList.add('none')
                     document.querySelector('#crop').classList.add('none')
                     document.querySelector('#draw').classList.add('none')
                     document.querySelector('#addText').classList.add('none')
@@ -272,9 +298,8 @@
                     canvas.remove(e.deselected[0]).renderAll();
                 }
                 if(e?.selected[0].type === 'textbox'){
-                    document.querySelector('#rotate-left').classList.add('none')
-                    document.querySelector('#rotate-right').classList.add('none')
-                    document.querySelector('#crop').classList.add('none')
+                    document.querySelector('#general-options').classList.add('none')
+                   document.querySelector('#crop').classList.add('none')
                     document.querySelector('#draw').classList.add('none')
                     document.querySelector('#addText').classList.add('none')
                     document.querySelector('.undo-redo-options').classList.add('none')
@@ -282,8 +307,7 @@
                     document.querySelector('.text-options').classList.remove('none')
                 }
                 if(e?.selected[0].id === 'croppingRect'){
-                    document.querySelector('#rotate-left').classList.add('none')
-                    document.querySelector('#rotate-right').classList.add('none')
+                    document.querySelector('#general-options').classList.add('none')
                     document.querySelector('#crop').classList.add('none')
                     document.querySelector('#draw').classList.add('none')
                     document.querySelector('#addText').classList.add('none')
@@ -296,8 +320,7 @@
             });
             canvas.on("selection:cleared", function (e) {
                 activeObject = e.target;
-                document.querySelector('#rotate-left').classList.remove('none')
-                document.querySelector('#rotate-right').classList.remove('none')
+                document.querySelector('#general-options').classList.remove('none')
                 document.querySelector('#crop').classList.remove('none')
                 document.querySelector('#draw').classList.remove('none')
                 document.querySelector('#addText').classList.remove('none')
@@ -319,16 +342,39 @@
                     id: 'image',
                     cropX: 0,
                     cropY: 0,
-                    angle: 0,
+                    // angle: 0,
                     width: activeObject.get("ogWidth"),
                     height: activeObject.get("ogHeight"),
-                    scaleX: activeObject.get("ogScaleX"),
-                    scaleY: activeObject.get("ogScaleY"),
+                    // scaleX: activeObject.get("ogScaleX"),
+                    // scaleY: activeObject.get("ogScaleY"),
                 })
                 .setCoords();
-            canvas.setWidth(activeObject.width * activeObject.scaleX);
-            canvas.setHeight(activeObject.height * activeObject.scaleY);
+
+
+            const isRotated90 = (activeObject.angle % 360 === 90 || activeObject.angle % 360 === 270);
+
+            const currentImgWidth = isRotated90 ? activeObject.ogHeight : activeObject.ogWidth;
+            const currentImgHeight = isRotated90 ? activeObject.ogWidth : activeObject.ogHeight;
+
+            const scaleX = window.innerWidth / currentImgWidth;
+            const scaleY = (window.innerHeight * 0.9) / currentImgHeight;
+            const scale = Math.min(scaleX, scaleY);
+            activeObject.scale(scale);
+            const newCanvasWidth = currentImgWidth * scale;
+            const newCanvasHeight = currentImgHeight * scale;
+
+            // Store the canvas center coordinates before resizing
+            const oldCenterX = canvas.width / 2;
+            const oldCenterY = canvas.height / 2;
+
+            // Resize canvas and recenter image
+            // canvas.setWidth(newCanvasWidth);
+            // canvas.setHeight(newCanvasHeight);
+
+            canvas.setWidth(newCanvasWidth);
+            canvas.setHeight(newCanvasHeight);
             canvas.centerObject(activeObject)
+
             const objects = canvas.getObjects();
 
             for (let obj of objects) {
@@ -349,25 +395,11 @@
 
             addCropRect();
 
-            document.querySelector('#general-options').classList.toggle('none')
-            document.querySelector('#rotate-left').classList.toggle('none')
-            document.querySelector('#rotate-right').classList.toggle('none')
-            document.querySelector('#crop').classList.toggle('none')
-            document.querySelector('#draw').classList.toggle('none')
-            document.querySelector('#addText').classList.toggle('none')
-            document.querySelector('.undo-redo-options').classList.toggle('none')
-            document.querySelector('.crop-options').classList.toggle('none')
+            cropOptionsDisplayToggle()
         })
         document.querySelector(`#crop-done`).addEventListener('click', (e) => {
-            document.querySelector('#general-options').classList.toggle('none')
-            document.querySelector('#rotate-left').classList.toggle('none')
-            document.querySelector('#rotate-right').classList.toggle('none')
-            document.querySelector('#crop').classList.toggle('none')
-            document.querySelector('#draw').classList.toggle('none')
-            document.querySelector('#addText').classList.toggle('none')
-            document.querySelector('.undo-redo-options').classList.toggle('none')
-            document.querySelector('.crop-options').classList.toggle('none')
 
+            cropOptionsDisplayToggle()
             cropImage();
             fitImageOnScreen()
             _self.history.addToHistory();
@@ -382,6 +414,15 @@
             rotateAndFitImageOnScreen(270)
 
         })
+
+        const cropOptionsDisplayToggle = () => {
+            document.querySelector('#general-options').classList.toggle('none')
+            document.querySelector('#crop').classList.toggle('none')
+            document.querySelector('#draw').classList.toggle('none')
+            document.querySelector('#addText').classList.toggle('none')
+            document.querySelector('.undo-redo-options').classList.toggle('none')
+            document.querySelector('.crop-options').classList.toggle('none')
+        }
     }
 
     window.ImageEditor.prototype.initializeCrop = crop;

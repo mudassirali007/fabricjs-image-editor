@@ -51,8 +51,6 @@
         _self.canvas.freeDrawingBrush.width = parseInt(document.querySelector("#draw-width").value)
         _self.history.addToHistory();
         document.querySelector('#general-options').classList.toggle('none')
-        document.querySelector('#rotate-left').classList.toggle('none')
-        document.querySelector('#rotate-right').classList.toggle('none')
         document.querySelector('#crop').classList.toggle('none')
         document.querySelector('#draw').classList.toggle('none')
         document.querySelector('#addText').classList.toggle('none')
@@ -98,8 +96,6 @@
       document.querySelector(`#draw-done`).addEventListener('click', (e) => {
         _self.canvas.isDrawingMode = false
         document.querySelector('#general-options').classList.toggle('none')
-        document.querySelector('#rotate-left').classList.toggle('none')
-        document.querySelector('#rotate-right').classList.toggle('none')
         document.querySelector('#crop').classList.toggle('none')
         document.querySelector('#draw').classList.toggle('none')
         document.querySelector('#addText').classList.toggle('none')
