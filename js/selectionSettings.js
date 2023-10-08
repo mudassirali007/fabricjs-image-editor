@@ -13,6 +13,10 @@
         const text = new fabric.Textbox('text here',{
           editingBorderColor : '#008000'
         });
+        text.setControlsVisibility({
+          mt: false,
+          mb: false,
+        });
         _self.canvas.add(text).renderAll();
         _self.history.addToHistory();
       })
