@@ -2,7 +2,7 @@
  * Define action to upload, drag & drop images into canvas
  */
 (function () {
-    var crop = function (canvas) {
+    const crop = function (canvas) {
         const _self = this;
         let activeObject;
 
@@ -189,6 +189,7 @@
                         ogTop: obj.top,
                         ogScaleX: obj.scaleX,
                         ogScaleY: obj.scaleY,
+                        ogAngle: obj.angle,
                     });
 
                     // obj.scale(scale);
@@ -363,13 +364,6 @@
             const newCanvasWidth = currentImgWidth * scale;
             const newCanvasHeight = currentImgHeight * scale;
 
-            // Store the canvas center coordinates before resizing
-            const oldCenterX = canvas.width / 2;
-            const oldCenterY = canvas.height / 2;
-
-            // Resize canvas and recenter image
-            // canvas.setWidth(newCanvasWidth);
-            // canvas.setHeight(newCanvasHeight);
 
             canvas.setWidth(newCanvasWidth);
             canvas.setHeight(newCanvasHeight);
