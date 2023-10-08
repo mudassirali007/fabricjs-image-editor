@@ -388,7 +388,6 @@
             canvas.renderAll();
 
             addCropRect();
-
             cropOptionsDisplayToggle()
         })
         document.querySelector(`#crop-done`).addEventListener('click', (e) => {

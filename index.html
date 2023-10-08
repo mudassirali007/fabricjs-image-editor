@@ -85,13 +85,19 @@
         <select id="canvasDropDown" class="none"></select>
     </div>
 
-    <div style="margin: auto 12px auto auto;">
+    <div class="right-align">
+        <button id="load-editor">Load Editor</button>
+        <button id="unload-editor">Unload Editor</button>
+    </div>
+
+    <div class="upload none" >
         <label for="btn-image-upload" class="upload-label">Upload Image</label>
         <input type="file" id="btn-image-upload" accept="image/*" hidden>
     </div>
-    <div class="download">
+    <div class="download none">
         <label for="btn-image-upload" class="upload-label" id="downloadPng">Download Image</label>
     </div>
+
 </aside>
 <main>
     <div id="image-editor-container" class="default-container">

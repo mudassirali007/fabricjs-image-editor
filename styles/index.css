@@ -22,7 +22,9 @@ body {
     align-items: center;
     height: 10vh;
 }
-
+.right-align {
+    margin: auto 12px auto auto;
+}
 /* Reset default button styles */
 .upload-label {
     padding: 4px;
@@ -33,6 +35,10 @@ body {
     border-radius: 4px;
     font-size: 16px;
     transition: background-color 0.3s;
+}
+
+.upload {
+    margin: 12px;
 }
 
 /* Styling for button hover state */

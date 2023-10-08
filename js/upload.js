@@ -10,7 +10,7 @@
     const addNewCanvasDropDown = () => {
       // Create a new option element
       const newOption = document.createElement('option');
-      canvasDropDown.classList.remove('none')
+      dropdown.classList.remove('none')
       newOption.value = `${dropdown.options.length}`;  // Set the value for the option
       newOption.textContent = `Canvas ${dropdown.options.length+1}`;  // Set the display text for the option
       dropdown.appendChild(newOption);
@@ -110,6 +110,29 @@
     document.querySelector(`#btn-image-upload`).addEventListener('change', function (e) {
       if (e.target.files.length === 0) return;
       processFiles(e.target.files)
+    })
+    const loadEditor = () => {
+      // new ImageEditor();
+      document.querySelector(`.download`).classList.remove('none')
+      document.querySelector(`.upload`).classList.remove('none')
+
+    }
+    document.querySelector(`#load-editor`).addEventListener('click', function (e) {
+      loadEditor()
+    })
+    const unloadEditor = () => {
+      canvas.clear()
+      _self.history.clearUndoRedoHistory();
+      _self.undoArray = [];
+      selectedCanvas = 0;
+      totalCanvas = 0;
+      dropdown.options.length = 0;
+      dropdown.classList.add('none');
+    }
+    document.querySelector(`#unload-editor`).addEventListener('click', function (e) {
+      unloadEditor()
+      document.querySelector(`.download`).classList.add('none')
+      document.querySelector(`.upload`).classList.add('none')
     })
   }
 
