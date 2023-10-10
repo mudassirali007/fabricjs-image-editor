@@ -8,13 +8,19 @@
 
         const addCropRect = () => {
             const image = canvas.getItemById('image');
+            const isCroppingRect = canvas.getItemById('croppingRect'); // Get cropping rectangle
+            if(isCroppingRect) {
+                isCroppingRect.visible = true
+                canvas.setActiveObject(isCroppingRect).renderAll();
+                return
+            }
             // After rendering the image, add a rectangle for cropping
             const croppingRect = new fabric.Rect({
                 id: 'croppingRect',
-                left: 150,
-                top: 150,
-                width: 200,
-                height: 200,
+                left: image.left,
+                top: image.top,
+                width: image.width * (image.scaleX - 0.001),
+                height: image.height * (image.scaleY - 0.001),
                 fill: 'rgba(0,0,0,0.5)', // semi-transparent
                 hasControls: true,       // allow resizing
                 hasBorders: true,
@@ -23,12 +29,18 @@
                 angle: image.angle,
             });
 
+
             croppingRect.setControlsVisibility({
                 mtr: false,
             });
             canvas.centerObject(croppingRect);
-            canvas.add(croppingRect);
+            canvas.add(croppingRect).setActiveObject(croppingRect).renderAll();
+
+
         }
+
+
+
         const checkBoundariesMoving = (event) => {
 
             let obj = event.target;
@@ -65,12 +77,12 @@
             let brNew = obj.getBoundingRect();
 
             if (((brNew.width+brNew.left)>=obj.canvas.width) || ((brNew.height+brNew.top)>=obj.canvas.height) || ((brNew.left<0) || (brNew.top<0))) {
-                obj.left = left1;
-                obj.top=top1;
-                obj.scaleX=scale1x;
-                obj.scaleY=scale1y;
-                obj.width=width1;
-                obj.height=height1;
+                obj.left = isNaN(left1) ? obj.left : left1;
+                obj.top = isNaN(top1) ? obj.top : top1;
+                obj.scaleX = isNaN(scale1x) ? obj.scaleX : scale1x;
+                obj.scaleY = isNaN(scale1y) ? obj.scaleY : scale1y;
+                obj.width = isNaN(width1) ? obj.width : width1;
+                obj.height = isNaN(height1) ? obj.height : height1;
             }
             else{
                 left1 =obj.left;
@@ -196,7 +208,10 @@
                     obj.setCoords();
                 }
             }
-            canvas.remove(croppingRect);
+            // canvas.remove(croppingRect);
+            croppingRect.visible = false
+            canvas.discardActiveObject(croppingRect)
+
             canvas.renderAll();
         }
 
@@ -334,7 +349,6 @@
 
 
         document.querySelector(`#crop`).addEventListener('click', (e) => {
-            if(canvas.getItemById('croppingRect')) return
             _self.history.addToHistory();
 
             activeObject = canvas.getItemById('image');
@@ -388,7 +402,7 @@
             canvas.renderAll();
 
             addCropRect();
-            cropOptionsDisplayToggle()
+            // cropOptionsDisplayToggle()
         })
         document.querySelector(`#crop-done`).addEventListener('click', (e) => {
 
