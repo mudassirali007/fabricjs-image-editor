@@ -17,10 +17,8 @@
             // After rendering the image, add a rectangle for cropping
             const croppingRect = new fabric.Rect({
                 id: 'croppingRect',
-                left: image.left,
-                top: image.top,
-                width: image.width * (image.scaleX - 0.001),
-                height: image.height * (image.scaleY - 0.001),
+                width: 200,
+                height: 200,
                 fill: 'rgba(0,0,0,0.5)', // semi-transparent
                 hasControls: true,       // allow resizing
                 hasBorders: true,
