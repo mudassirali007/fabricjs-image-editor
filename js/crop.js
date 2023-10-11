@@ -52,11 +52,15 @@
             if(obj.getBoundingRect().top < 0 || obj.getBoundingRect().left < 0){
                 obj.top = Math.max(obj.top, obj.top-obj.getBoundingRect().top) - 0.001;
                 obj.left = Math.max(obj.left, obj.left-obj.getBoundingRect().left)  - 0.001;
+                left1 = obj.left;
+                top1 = obj.top;
             }
             // bot-right corner
             if(obj.getBoundingRect().top+obj.getBoundingRect().height  > obj.canvas.height || obj.getBoundingRect().left+obj.getBoundingRect().width  > obj.canvas.width){
                 obj.top = Math.min(obj.top, obj.canvas.height-obj.getBoundingRect().height+obj.top-obj.getBoundingRect().top) - 0.001;
                 obj.left = Math.min(obj.left, obj.canvas.width-obj.getBoundingRect().width+obj.left-obj.getBoundingRect().left) - 0.001;
+                left1 = obj.left;
+                top1 = obj.top;
 
             }
 
@@ -66,31 +70,35 @@
         let top1 = 0 ;
         let scale1x = 0 ;
         let scale1y = 0 ;
-        let width1 = 0 ;
-        let height1 = 0 ;
+
         const checkBoundariesScaling = (event) => {
             let obj = event.target;
 
             obj.setCoords();
             let brNew = obj.getBoundingRect();
 
-            if (((brNew.width+brNew.left)>=obj.canvas.width) || ((brNew.height+brNew.top)>=obj.canvas.height) || ((brNew.left<0) || (brNew.top<0))) {
-                obj.left = isNaN(left1) ? obj.left : left1;
-                obj.top = isNaN(top1) ? obj.top : top1;
-                obj.scaleX = isNaN(scale1x) ? obj.scaleX : scale1x;
-                obj.scaleY = isNaN(scale1y) ? obj.scaleY : scale1y;
-                obj.width = isNaN(width1) ? obj.width : width1;
-                obj.height = isNaN(height1) ? obj.height : height1;
+            // Check if the object is outside the canvas boundaries
+            if ((brNew.width + brNew.left) > obj.canvas.width) {
+                obj.left -= (brNew.width + brNew.left) - obj.canvas.width;
             }
-            else{
-                left1 =obj.left;
-                top1 =obj.top;
-                scale1x = obj.scaleX;
-                scale1y=obj.scaleY;
-                width1=obj.width;
-                height1=obj.height;
+            if (brNew.left < 0) {
+                obj.left -= brNew.left;
             }
+            if ((brNew.height + brNew.top) > obj.canvas.height) {
+                obj.top -= (brNew.height + brNew.top) - obj.canvas.height;
+            }
+            if (brNew.top < 0) {
+                obj.top -= brNew.top;
+            }
+
+            // Update the previous values
+            left1 = obj.left;
+            top1 = obj.top;
+            scale1x = obj.scaleX;
+            scale1y = obj.scaleY;
         }
+
+
 
         // Function to crop the image
         const rotatePoint = (x, y, cx, cy, angle) => {
