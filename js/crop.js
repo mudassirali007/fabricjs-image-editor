@@ -27,7 +27,6 @@
                 angle: image.angle,
             });
 
-
             croppingRect.setControlsVisibility({
                 mtr: false,
             });
