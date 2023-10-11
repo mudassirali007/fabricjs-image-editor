@@ -36,8 +36,6 @@
 
         }
 
-
-
         const checkBoundariesMoving = (event) => {
 
             let obj = event.target;
@@ -68,7 +66,6 @@
         let top1 = 0;
         let scale1x = 0;
         let scale1y = 0;
-
         const checkBoundariesScaling = (event) => {
             let obj = event.target;
 
@@ -114,9 +111,6 @@
                 scale1y = obj.scaleY;
             }
         }
-
-
-
 
         // Function to crop the image
         const rotatePoint = (x, y, cx, cy, angle) => {
@@ -244,8 +238,8 @@
 
             // Rotate the image
             image.angle = (image.angle + angle) % 360;
-            const isRotated90 = (image.angle % 360 === 90 || image.angle % 360 === 270);
-
+            // const isRotated90 = (image.angle % 360 === 90 || image.angle % 360 === 270);
+            const isRotated90 = (image.angle % 180 === 90);
             const currentImgWidth = isRotated90 ? image.height : image.width;
             const currentImgHeight = isRotated90 ? image.width : image.height;
 
@@ -273,7 +267,7 @@
             // Update positions of all other objects
             const objects = canvas.getObjects();
             for (let obj of objects) {
-                if (obj.id !== 'image') {
+                if (obj.id !== 'image' && obj.id !== 'croppingRect') {
                     const vecOld = { x: obj.left - oldCenterX, y: obj.top - oldCenterY };
                     const angleInRadians = angle * (Math.PI / 180);
                     const vecNew = {
@@ -291,6 +285,11 @@
                         ogScaleX: obj.scaleX,
                         ogScaleY: obj.scaleY,
                     }).setCoords();
+
+                }
+                if (obj.id === 'croppingRect') {
+                    canvas.centerObject(obj);
+                    obj.scale(scale);
                 }
             }
 
