@@ -63,13 +63,12 @@
                 top1 = obj.top;
 
             }
-
             canvas.renderAll();
         }
         let left1 = 0;
-        let top1 = 0 ;
-        let scale1x = 0 ;
-        let scale1y = 0 ;
+        let top1 = 0;
+        let scale1x = 0;
+        let scale1y = 0;
 
         const checkBoundariesScaling = (event) => {
             let obj = event.target;
@@ -77,26 +76,46 @@
             obj.setCoords();
             let brNew = obj.getBoundingRect();
 
-            // Check if the object is outside the canvas boundaries
-            if ((brNew.width + brNew.left) > obj.canvas.width) {
-                obj.left -= (brNew.width + brNew.left) - obj.canvas.width;
-            }
-            if (brNew.left < 0) {
-                obj.left -= brNew.left;
-            }
-            if ((brNew.height + brNew.top) > obj.canvas.height) {
-                obj.top -= (brNew.height + brNew.top) - obj.canvas.height;
-            }
-            if (brNew.top < 0) {
-                obj.top -= brNew.top;
-            }
+            if ((brNew.width + brNew.left) >= obj.canvas.width ||
+                (brNew.height + brNew.top) >= obj.canvas.height ||
+                brNew.left < 0 ||
+                brNew.top < 0) {
 
-            // Update the previous values
-            left1 = obj.left;
-            top1 = obj.top;
-            scale1x = obj.scaleX;
-            scale1y = obj.scaleY;
+                // If bounding rect is negative on the left, adjust object's left position
+                if (brNew.left < 0) {
+                    obj.left -= brNew.left;
+                }
+
+                // If bounding rect is negative on the top, adjust object's top position
+                if (brNew.top < 0) {
+                    obj.top -= brNew.top;
+                }
+
+                // After adjustments, if it's still out of bounds, revert to previous values
+                obj.setCoords();
+                brNew = obj.getBoundingRect();
+                if ((brNew.width + brNew.left) >= obj.canvas.width ||
+                    (brNew.height + brNew.top) >= obj.canvas.height ||
+                    brNew.left < 0 ||
+                    brNew.top < 0) {
+                    obj.left = isNaN(left1) ? obj.left : left1;
+                    obj.top = isNaN(top1) ? obj.top : top1;
+                    obj.scaleX = isNaN(scale1x) ? obj.scaleX : scale1x;
+                    obj.scaleY = isNaN(scale1y) ? obj.scaleY : scale1y;
+                } else {
+                    left1 = obj.left;
+                    top1 = obj.top;
+                    scale1x = obj.scaleX;
+                    scale1y = obj.scaleY;
+                }
+            } else {
+                left1 = obj.left;
+                top1 = obj.top;
+                scale1x = obj.scaleX;
+                scale1y = obj.scaleY;
+            }
         }
+
 
 
 
